@@ -64,6 +64,7 @@ const MixerDisplay: React.FC<MixerDisplayProps> = ({ selectedColors, mixedColor,
     return (
         <div className="w-full bg-gray-200 rounded-3xl p-4 md:p-8 my-6 shadow-lg">
              <h2 className="text-2xl font-bold text-center text-gray-700 mb-6">2. 색을 섞어봐요!</h2>
+             <p className="text-center text-gray-500 -mt-4 mb-6">💡 색을 넣고 비율을 조절해 보세요!</p>
             <div className="flex justify-around items-center gap-2">
                 <ColorSlot color={selectedColors[0]} onClear={() => onClearSlot(0)} />
                 <div className="flex-grow flex flex-col items-center max-w-xs">
