@@ -160,7 +160,7 @@ const App: React.FC = () => {
 
             <footer className="text-center py-4 text-gray-500 text-sm">
                 <p>&copy; {new Date().getFullYear()} 색깔 혼합 연구소. 즐겁게 배워요!</p>
-                <p className="mt-1">오류 문의 : <a href="mailto:nalrary@mensakorea.org" className="hover:underline text-blue-500">nalrary@mensakorea.org</a></p>
+                <p className="mt-1">오류 문의 : 김혜진 <a href="mailto:nalrary@mensakorea.org" className="hover:underline text-blue-500">nalrary@mensakorea.org</a></p>
             </footer>
         </div>
     );
