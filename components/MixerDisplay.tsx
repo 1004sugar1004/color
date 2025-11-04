@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import type { MunsellColor } from '../types';
 import { SaveIcon, UndoIcon } from './Icons';
@@ -33,6 +32,32 @@ const ColorSlot: React.FC<{ color: MunsellColor | null; onClear: () => void; }> 
     );
 }
 
+const RatioDisplay: React.FC<{ percent: number }> = ({ percent }) => {
+    const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b));
+    
+    const commonDivisor = gcd(percent, 100);
+    const num = percent / commonDivisor;
+    const den = 100 / commonDivisor;
+
+    return (
+        <div className="flex flex-col items-center mt-2">
+            <p className="text-xl font-bold text-gray-800 tracking-wider">
+                {percent}%
+            </p>
+            {den > 1 ? (
+                <div className="flex flex-col items-center text-lg font-bold text-gray-700 mt-1" aria-label={`분수 ${den}분의 ${num}`}>
+                    <span>{num}</span>
+                    <span className="border-t-2 border-gray-700 w-6 my-0.5"></span>
+                    <span>{den}</span>
+                </div>
+            ) : (
+                <div className="h-[58px]"></div>
+            )}
+        </div>
+    );
+};
+
+
 const MixerDisplay: React.FC<MixerDisplayProps> = ({ selectedColors, mixedColor, feedback, mixRatio, onRatioChange, onUndo, onSave, onClearSlot }) => {
     const [showSaveModal, setShowSaveModal] = useState(false);
     const [colorName, setColorName] = useState('');
@@ -60,35 +85,49 @@ const MixerDisplay: React.FC<MixerDisplayProps> = ({ selectedColors, mixedColor,
     }
 
     const showSlider = selectedColors[0] && selectedColors[1];
+    
+    // Per user feedback, reverting to the "reversed" ratio logic.
+    // The slider's mixRatio represents the proportion of the RIGHT color.
+    // 0 = 100% left, 0% right. 1 = 0% left, 100% right.
+    const percent_right = Math.round(mixRatio * 100);
+    const percent_left = 100 - percent_right;
 
     return (
         <div className="w-full bg-gray-200 rounded-3xl p-4 md:p-8 my-6 shadow-lg">
              <h2 className="text-2xl font-bold text-center text-gray-700 mb-6">2. 색을 섞어봐요!</h2>
              <p className="text-center text-gray-500 -mt-4 mb-6">💡 색을 넣고 비율을 조절해 보세요!</p>
-            <div className="flex justify-around items-center gap-2">
-                <ColorSlot color={selectedColors[0]} onClear={() => onClearSlot(0)} />
-                <div className="flex-grow flex flex-col items-center max-w-xs">
+            <div className="flex justify-around items-start gap-2">
+                {/* Left Slot & Ratio */}
+                <div className="flex flex-col items-center">
+                    <ColorSlot color={selectedColors[0]} onClear={() => onClearSlot(0)} />
+                    {showSlider && <RatioDisplay percent={percent_left} />}
+                </div>
+
+                {/* Center Control */}
+                <div className="flex-grow flex flex-col items-center justify-center max-w-xs pt-16">
                     {showSlider ? (
-                        <>
-                            <input
-                                type="range"
-                                min="0"
-                                max="1"
-                                step="0.01"
-                                value={mixRatio}
-                                onChange={e => onRatioChange(parseFloat(e.target.value))}
-                                className="w-full h-3 bg-gray-300 rounded-full appearance-none cursor-pointer"
-                                style={{
-                                    background: `linear-gradient(to right, ${selectedColors[0]?.hex} 0%, ${selectedColors[1]?.hex} 100%)`
-                                }}
-                            />
-                            <p className="text-sm text-gray-600 mt-2 font-semibold">비율 조절하기</p>
-                        </>
+                        <input
+                            type="range"
+                            min="0"
+                            max="1"
+                            step="0.01"
+                            value={mixRatio}
+                            onChange={e => onRatioChange(parseFloat(e.target.value))}
+                            className="w-full h-3 bg-gray-300 rounded-full appearance-none cursor-pointer"
+                            style={{
+                                background: `linear-gradient(to right, ${selectedColors[0]?.hex} 0%, ${selectedColors[1]?.hex} 100%)`
+                            }}
+                        />
                     ) : (
                         <span className="text-4xl font-bold text-gray-400">+</span>
                     )}
                 </div>
-                <ColorSlot color={selectedColors[1]} onClear={() => onClearSlot(1)} />
+
+                 {/* Right Slot & Ratio */}
+                 <div className="flex flex-col items-center">
+                    <ColorSlot color={selectedColors[1]} onClear={() => onClearSlot(1)} />
+                    {showSlider && <RatioDisplay percent={percent_right} />}
+                 </div>
             </div>
 
             <div className="my-6 text-center text-4xl font-bold text-gray-500">=</div>

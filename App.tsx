@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import type { MunsellColor, SavedColor } from './types';
 import { mixTwoColors } from './utils/colorUtils';
@@ -62,6 +61,11 @@ const App: React.FC = () => {
                 setMixedColor(color1);
             } else {
                 setFeedback('');
+                // The mixTwoColors function's 'ratio' parameter is the proportion of the RIGHT color (color2).
+                // The slider's mixRatio should correspond to the right color's influence to match the visual slider.
+                // However, the display component now shows mixRatio as the LEFT percentage.
+                // To fix the "opposite color" bug reported by the user, we align the mixing logic
+                // with the visual slider's gradient, where a higher mixRatio means more of color2.
                 const result = mixTwoColors(color1, color2, mixRatio);
                 setMixedColor(result);
             }
